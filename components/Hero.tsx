@@ -32,7 +32,7 @@ export default function Hero() {
           href="/prodotti"
           className="group flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-8 py-3.5 text-base font-semibold text-primary transition-all hover:bg-primary/10 hover:border-primary/40 active:scale-95"
         >
-          Visita i nostri prodotti
+          Visita il nostro Shop
           <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
         </Link>
       </div>

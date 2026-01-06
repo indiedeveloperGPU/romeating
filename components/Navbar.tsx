@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 
 const navItems = [
   { path: "/", name: "Home", icon: HomeIcon },
-  { path: "/prodotti", name: "Prodotti", icon: ShoppingBag }, 
+  { path: "/prodotti", name: "Shop", icon: ShoppingBag }, 
   { path: "/food-tours", name: "Food Tours", icon: Map },
   { path: "/contatti", name: "Contatti", icon: Info }, 
 ];

@@ -33,7 +33,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/prodotti" className="hover:text-primary transition-colors">
-                  Prodotti
+                  Shop
                 </Link>
               </li>
               <li>
