@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Playfair_Display } from "next/font/google";
-import Navbar from "@/components/Navbar"; // Assicurati che l'import sia corretto
-import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,16 +25,9 @@ export default function RootLayout({
   return (
     <html lang="it">
       <body
-        className={`${geistSans.variable} ${playfair.variable} antialiased flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${playfair.variable} antialiased min-h-screen bg-stone-50`}
       >
-        <Navbar />
-        
-        <main className="grow">
-          {children}
-        </main>
-        <WhatsAppButton />
-
-        <Footer />
+        {children}
       </body>
     </html>
   );

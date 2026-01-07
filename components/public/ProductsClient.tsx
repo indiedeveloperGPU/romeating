@@ -1,108 +1,37 @@
-"use client"; // Necessario per gestire lo stato della vista (Categorie vs Prodotti)
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight, Star, Tag, List, ArrowLeft, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-interface Product {
+// Definiamo l'interfaccia basata su come arrivano i dati dal DB (mappati)
+export interface Product {
   id: number;
   category: string;
   name: string;
   description: string;
-  price: string;
-  originalPrice?: string; // Opzionale
+  price: number;
+  originalPrice?: number | null;
   image: string;
   partner: string;
   badge: string | null;
   link: string;
 }
 
-// DATI MOCK
-const PRODUCTS = [
-  // CATEGORIA: LA MIA LISTA AMAZON
-  {
-    id: 1,
-    category: "amazon_list",
-    name: "Macchina per Pasta Atlas 150",
-    description: "La regina delle macchine per pasta fatte in casa. Marcato Design, solida e durevole.",
-    price: "€79,90",
-    image: "https://images.unsplash.com/photo-1598866594230-a7d127dddb18?q=80&w=800&auto=format&fit=crop",
-    partner: "Amazon",
-    badge: "Must Have",
-    link: "https://amazon.it",
-  },
-  {
-    id: 2,
-    category: "amazon_list",
-    name: "Pecorino Romano DOP",
-    description: "Formaggio a pasta dura, latte di pecora intero. Stagionatura minima 5 mesi.",
-    price: "€24,50",
-    image: "https://images.unsplash.com/photo-1634487359989-3e913a697195?q=80&w=800&auto=format&fit=crop",
-    partner: "Amazon",
-    badge: "Top Choice",
-    link: "https://amazon.it",
-  },
-  {
-    id: 3,
-    category: "amazon_list",
-    name: "Guanciale Stagionato",
-    description: "Il vero re della Carbonara. Stagionatura 60 giorni, pepatura manuale.",
-    price: "€18,90",
-    image: "https://images.unsplash.com/photo-1608755728617-aefab37d2edd?q=80&w=800&auto=format&fit=crop",
-    partner: "Amazon",
-    badge: null,
-    link: "https://amazon.it",
-  },
-  
-  // CATEGORIA: PRODOTTI SCONTATI
-  {
-    id: 4,
-    category: "discounted",
-    name: "Set Coltelli Professionali",
-    description: "Acciaio inox di alta qualità per ogni esigenza in cucina.",
-    price: "€45,00",
-    originalPrice: "€65,00",
-    image: "https://images.unsplash.com/photo-1593618998160-e34014e67546?q=80&w=800&auto=format&fit=crop",
-    partner: "Amazon",
-    badge: "-30%",
-    link: "#",
-  },
-  {
-    id: 5,
-    category: "discounted",
-    name: "Padella Antiaderente Stone",
-    description: "Rivestimento in pietra lavica, perfetta per saltare la pasta.",
-    price: "€22,90",
-    originalPrice: "€35,00",
-    image: "https://images.unsplash.com/photo-1584992236310-6eddd724a4c7?q=80&w=800&auto=format&fit=crop",
-    partner: "Amazon",
-    badge: "Offerta",
-    link: "#",
-  },
-  {
-    id: 6,
-    category: "discounted",
-    name: "Grembiule da Chef Romeating",
-    description: "Cotone 100% organico con ricamo personalizzato.",
-    price: "€19,90",
-    originalPrice: "€29,90",
-    image: "https://images.unsplash.com/photo-1556910103-1c02745a30bf?q=80&w=800&auto=format&fit=crop",
-    partner: "Romeating Shop",
-    badge: "Limited",
-    link: "#",
-  },
-];
+// Utility per formattare prezzo
+const formatPrice = (price: number) => 
+  new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(price);
 
-// Componente Card Prodotto (identico a prima)
+// Componente Card Prodotto
 const ProductCard = ({ product }: { product: Product }) => (
   <div className="group flex flex-col overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-stone-200 transition-all hover:shadow-md hover:ring-primary/20">
     <div className="relative aspect-square overflow-hidden bg-stone-100">
       {product.badge && (
         <span className={`absolute left-2 top-2 z-10 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold text-white shadow-sm backdrop-blur-sm sm:left-3 sm:top-3 sm:text-xs
-          ${product.category === 'discounted' ? 'bg-red-600' : 'bg-primary/90'}
+          ${product.category === 'scontati' ? 'bg-red-600' : 'bg-primary/90'}
         `}>
-          {product.category === 'discounted' ? <Tag size={10} className="mr-1" /> : <Star size={10} className="mr-1" />}
+          {product.category === 'scontati' ? <Tag size={10} className="mr-1" /> : <Star size={10} className="mr-1" />}
           {product.badge}
         </span>
       )}
@@ -120,11 +49,11 @@ const ProductCard = ({ product }: { product: Product }) => (
          <div className="flex items-center gap-2">
            {product.originalPrice && (
              <span className="text-xs text-stone-400 line-through">
-               {product.originalPrice}
+               {formatPrice(product.originalPrice)}
              </span>
            )}
-           <span className={`text-sm font-bold sm:text-lg ${product.category === 'discounted' ? 'text-red-600' : 'text-primary'}`}>
-              {product.price}
+           <span className={`text-sm font-bold sm:text-lg ${product.category === 'scontati' ? 'text-red-600' : 'text-primary'}`}>
+              {formatPrice(product.price)}
            </span>
          </div>
       </div>
@@ -145,21 +74,25 @@ const ProductCard = ({ product }: { product: Product }) => (
         rel="noopener noreferrer"
         className="mt-auto flex w-full items-center justify-center gap-1.5 rounded-lg bg-stone-900 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-primary sm:text-sm sm:py-2.5"
       >
-        <span className="truncate">Vedi su Amazon</span>
+        <span className="truncate">Vedi su {product.partner}</span>
         <ArrowUpRight size={14} className="shrink-0" />
       </Link>
     </div>
   </div>
 );
 
-// Tipi per la vista attiva
-type ViewState = 'categories' | 'amazon_list' | 'discounted';
+// Tipi per la vista attiva (devono coincidere con i valori nel DB)
+type ViewState = 'categories' | 'lista_amazon' | 'scontati';
 
-export default function ProdottiPage() {
+interface ProductsClientProps {
+  products: Product[];
+}
+
+export default function ProductsClient({ products }: ProductsClientProps) {
   const [view, setView] = useState<ViewState>('categories');
 
-  // Filtra prodotti in base alla vista
-  const currentProducts = PRODUCTS.filter(p => p.category === view);
+  // Filtra prodotti
+  const currentProducts = products.filter(p => p.category === view);
 
   return (
     <div className="min-h-[80vh] py-8 sm:py-12">
@@ -178,7 +111,6 @@ export default function ProdottiPage() {
             </motion.div>
           ) : (
             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col items-center">
-               {/* Tasto Back */}
               <button 
                 onClick={() => setView('categories')}
                 className="mb-4 flex items-center gap-2 text-sm font-medium text-stone-500 hover:text-primary transition-colors"
@@ -188,7 +120,7 @@ export default function ProdottiPage() {
               </button>
               
               <h1 className="font-serif text-3xl font-bold text-foreground">
-                {view === 'amazon_list' ? 'La mia lista Amazon' : 'Prodotti Scontati'}
+                {view === 'lista_amazon' ? 'La mia lista Amazon' : 'Prodotti Scontati'}
               </h1>
             </motion.div>
           )}
@@ -209,7 +141,7 @@ export default function ProdottiPage() {
             >
               {/* Card Categoria: Amazon List */}
               <button 
-                onClick={() => setView('amazon_list')}
+                onClick={() => setView('lista_amazon')}
                 className="group relative flex h-64 flex-col items-center justify-center overflow-hidden rounded-2xl bg-stone-100 p-8 text-center shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
               >
                 <div 
@@ -230,7 +162,7 @@ export default function ProdottiPage() {
 
               {/* Card Categoria: Scontati */}
               <button 
-                onClick={() => setView('discounted')}
+                onClick={() => setView('scontati')}
                 className="group relative flex h-64 flex-col items-center justify-center overflow-hidden rounded-2xl bg-red-50 p-8 text-center shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
               >
                 <div 
