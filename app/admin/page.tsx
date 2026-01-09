@@ -43,7 +43,6 @@ export default function AdminDashboard() {
             Prossimamente disponibile.
           </p>
         </div>
-
       </div>
     </div>
   );

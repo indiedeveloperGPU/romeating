@@ -4,9 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getUploadUrl } from "@/actions/storage";
-import { Save, Loader2, X, Upload } from "lucide-react";
+import { Save, Loader2, X, Upload, Check, ChevronDown  } from "lucide-react";
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import Link from "next/link";
-import { toast } from "sonner"; // <--- 1. Importiamo Sonner
+import { toast } from "sonner";
 
 // Definiamo il tipo dei dati che ci aspettiamo dal DB
 interface ProductData {
@@ -212,11 +213,65 @@ export default function ProductForm({ initialData }: ProductFormProps) {
         <h2 className="text-lg font-bold text-foreground mb-4">Dettagli & Link</h2>
         <div className="grid gap-6 md:grid-cols-2">
           <div>
-            <label className="label">Categoria</label>
-            <select name="categoria" value={formData.categoria} onChange={handleChange} className="input">
-              <option value="lista_amazon">Lista Amazon</option>
-              <option value="scontati">Prodotti Scontati</option>
-            </select>
+            <div>
+  <label className="label">Categoria</label>
+  <Listbox value={formData.categoria} onChange={(value) => setFormData(prev => ({ ...prev, categoria: value }))}>
+    <div className="relative">
+      <ListboxButton className="input w-full flex items-center justify-between cursor-pointer hover:border-stone-300 transition-colors">
+        <span className="block truncate">
+          {formData.categoria === "lista_amazon" ? "Lista Amazon" : "Prodotti Scontati"}
+        </span>
+        <ChevronDown size={18} className="text-stone-400" />
+      </ListboxButton>
+      
+      <ListboxOptions className="absolute z-10 mt-1 w-full overflow-hidden rounded-lg border border-stone-200 bg-white shadow-lg focus:outline-none">
+        <ListboxOption
+          value="lista_amazon"
+          className={({ active }) =>
+            `relative cursor-pointer select-none py-3 pl-10 pr-4 transition-colors ${
+              active ? 'bg-stone-50 text-foreground' : 'text-stone-700'
+            }`
+          }
+        >
+          {({ selected }) => (
+            <>
+              <span className={`block truncate ${selected ? 'font-semibold' : 'font-normal'}`}>
+                Lista Amazon
+              </span>
+              {selected && (
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                  <Check size={18} />
+                </span>
+              )}
+            </>
+          )}
+        </ListboxOption>
+        
+        <ListboxOption
+          value="scontati"
+          className={({ active }) =>
+            `relative cursor-pointer select-none py-3 pl-10 pr-4 transition-colors ${
+              active ? 'bg-stone-50 text-foreground' : 'text-stone-700'
+            }`
+          }
+        >
+          {({ selected }) => (
+            <>
+              <span className={`block truncate ${selected ? 'font-semibold' : 'font-normal'}`}>
+                Prodotti Scontati
+              </span>
+              {selected && (
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                  <Check size={18} />
+                </span>
+              )}
+            </>
+          )}
+        </ListboxOption>
+      </ListboxOptions>
+    </div>
+  </Listbox>
+</div>
           </div>
           <div>
             <label className="label">Badge (Opzionale)</label>
